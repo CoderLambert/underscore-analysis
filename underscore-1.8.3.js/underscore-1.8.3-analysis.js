@@ -32,19 +32,19 @@
   // 缓存变量, 便于压缩代码
   // 同时可减少在原型链中的查找次数(提高代码效率)
   var
-    push             = ArrayProto.push,
-    slice            = ArrayProto.slice,
-    toString         = ObjProto.toString,
-    hasOwnProperty   = ObjProto.hasOwnProperty;
+  push             = ArrayProto.push,
+  slice            = ArrayProto.slice,
+  toString         = ObjProto.toString,
+  hasOwnProperty   = ObjProto.hasOwnProperty;
 
   // All **ECMAScript 5** native function implementations that we hope to use
   // are declared here.
   // ES5 原生方法, 如果浏览器支持, 则 underscore 中会优先使用
   var
-    nativeIsArray      = Array.isArray,
-    nativeKeys         = Object.keys,
-    nativeBind         = FuncProto.bind,
-    nativeCreate       = Object.create;
+  nativeIsArray      = Array.isArray,
+  nativeKeys         = Object.keys,
+  nativeBind         = FuncProto.bind,
+  nativeCreate       = Object.create;
 
   // Naked function reference for surrogate-prototype-swapping.
   var Ctor = function(){};
@@ -153,6 +153,9 @@
   // _.extend = createAssigner(_.allKeys);
   // _.extendOwn = _.assign = createAssigner(_.keys);
   // _.defaults = createAssigner(_.allKeys, true);
+
+  //——————————————————————————————————————————————————————
+  //这个函数实现了把多个对象拷贝到一个对象里面。。。并且也把这个函数赋给别的(_.assign)暴露给用户
   var createAssigner = function(keysFunc, undefinedOnly) {
     // 返回函数
     // 经典闭包（undefinedOnly 参数在返回的函数中被引用）
@@ -264,6 +267,10 @@
   // notice: 不要传入一个带有 key 类型为 number 的对象！
   // notice: _.each 方法不能用 return 跳出循环（同样，Array.prototype.forEach 也不行）
   _.each = _.forEach = function(obj, iteratee, context) {
+
+    //——————————————————————————————————————
+    //在实际的使用中，实际上是很少传入第三个参数的，但这也正是underscore全面之处...
+
     // 根据 context 确定不同的迭代函数
     iteratee = optimizeCb(iteratee, context);
 
@@ -275,6 +282,11 @@
       // 遍历
       for (i = 0, length = obj.length; i < length; i++) {
         iteratee(obj[i], i, obj);
+        //——————————————————————————————————————
+        //这里面就直接调用程序了,要么就是自身传入的函数，如果传入了自己的上下文就是经过如下处理的函数:
+        //case 3: return function(value, index, collection) {
+        //return func.call(context, value, index, collection);
+        // };
       }
     } else { // 如果 obj 是对象
       // 获取对象的所有 key 值
@@ -346,8 +358,8 @@
     return function(obj, iteratee, memo, context) {
       iteratee = optimizeCb(iteratee, context, 4);
       var keys = !isArrayLike(obj) && _.keys(obj),
-          length = (keys || obj).length,
-          index = dir > 0 ? 0 : length - 1;
+      length = (keys || obj).length,
+      index = dir > 0 ? 0 : length - 1;
 
       // Determine the initial value if none is provided.
       // 如果没有指定初始值
@@ -435,7 +447,7 @@
     predicate = cb(predicate, context);
 
     var keys = !isArrayLike(obj) && _.keys(obj),
-        length = (keys || obj).length;
+    length = (keys || obj).length;
 
     for (var index = 0; index < length; index++) {
       var currentKey = keys ? keys[index] : index;
@@ -459,7 +471,7 @@
     predicate = cb(predicate, context);
     // 如果传参是对象，则返回该对象的 keys 数组
     var keys = !isArrayLike(obj) && _.keys(obj),
-        length = (keys || obj).length;
+    length = (keys || obj).length;
     for (var index = 0; index < length; index++) {
       var currentKey = keys ? keys[index] : index;
       // 如果有一个元素满足条件，则返回 true
@@ -549,7 +561,7 @@
   // _.max(list, [iteratee], [context])
   _.max = function(obj, iteratee, context) {
     var result = -Infinity, lastComputed = -Infinity,
-        value, computed;
+    value, computed;
 
     // 单纯地寻找最值
     if (iteratee == null && obj != null) {
@@ -589,7 +601,7 @@
   // _.min(list, [iteratee], [context])
   _.min = function(obj, iteratee, context) {
     var result = Infinity, lastComputed = Infinity,
-        value, computed;
+    value, computed;
     if (iteratee == null && obj != null) {
       obj = isArrayLike(obj) ? obj : _.values(obj);
       for (var i = 0, length = obj.length; i < length; i++) {
@@ -676,14 +688,14 @@
           criteria: iteratee(value, index, list)
         };
       }).sort(function(left, right) {
-      var a = left.criteria;
-      var b = right.criteria;
-      if (a !== b) {
-        if (a > b || a === void 0) return 1;
-        if (a < b || b === void 0) return -1;
-      }
-      return left.index - right.index;
-    }), 'value');
+        var a = left.criteria;
+        var b = right.criteria;
+        if (a !== b) {
+          if (a > b || a === void 0) return 1;
+          if (a < b || b === void 0) return -1;
+        }
+        return left.index - right.index;
+      }), 'value');
 
   };
 
@@ -1064,7 +1076,7 @@
     var argsLength = arguments.length;
 
      // 遍历第一个数组的元素
-    for (var i = 0, length = getLength(array); i < length; i++) {
+     for (var i = 0, length = getLength(array); i < length; i++) {
       var item = array[i];
 
       // 如果 result[] 中已经有 item 元素了，continue
@@ -1704,7 +1716,7 @@
       // 在某一段的连续触发中，只会在第一次触发时进入这个 if 分支中
       if (!timeout)
         // 设置了 timeout，所以以后不会进入这个 if 分支了
-        timeout = setTimeout(later, wait);
+      timeout = setTimeout(later, wait);
 
       // 如果是立即触发
       if (callNow) {
@@ -1823,7 +1835,7 @@
   // 而 constructor 表示的是对象的构造函数
   // 所以区分开来了
   var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
-                      'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
+  'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
 
   // obj 为需要遍历键值对的对象
   // keys 为键数组
@@ -1883,7 +1895,7 @@
     // own enumerable properties
     for (var key in obj)
       // hasOwnProperty
-      if (_.has(obj, key)) keys.push(key);
+    if (_.has(obj, key)) keys.push(key);
 
     // Ahem, IE < 9.
     // IE < 9 下不能用 for in 来枚举某些 key 值
@@ -1946,12 +1958,12 @@
     iteratee = cb(iteratee, context);
 
     var keys =  _.keys(obj),
-        length = keys.length,
+    length = keys.length,
         results = {}, // 对象副本，该方法返回的对象
         currentKey;
 
-    for (var index = 0; index < length; index++) {
-      currentKey = keys[index];
+        for (var index = 0; index < length; index++) {
+          currentKey = keys[index];
       // key 值不变
       // 对每个 value 值用迭代函数迭代
       // 返回经过函数运算后的值
@@ -2314,11 +2326,11 @@
       // aCtor instanceof aCtor 这步有点不大理解，啥用？
       var aCtor = a.constructor, bCtor = b.constructor;
       if (aCtor !== bCtor && !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
-                               _.isFunction(bCtor) && bCtor instanceof bCtor)
-                          && ('constructor' in a && 'constructor' in b)) {
+       _.isFunction(bCtor) && bCtor instanceof bCtor)
+        && ('constructor' in a && 'constructor' in b)) {
         return false;
-      }
     }
+  }
 
     // Assume equality for cyclic structures. The algorithm for detecting cyclic
     // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
@@ -2737,9 +2749,9 @@
       \n     => \\n
       \u2028 => \\u2028
       \u2029 => \\u2029
-    **/
-    return '\\' + escapes[match];
-  };
+      **/
+      return '\\' + escapes[match];
+    };
 
   // 将 JavaScript 模板编译为可以用于页面呈现的函数
   // JavaScript micro-templating, similar to John Resig's implementation.
@@ -2774,7 +2786,7 @@
       (settings.escape || noMatch).source,
       (settings.interpolate || noMatch).source,
       (settings.evaluate || noMatch).source
-    ].join('|') + '|$', 'g');
+      ].join('|') + '|$', 'g');
 
     // Compile the template source, escaping string literals appropriately.
     // 编译模板字符串，将原始的模板字符串替换成函数字符串
@@ -2832,8 +2844,8 @@
     // 增加 print 功能
     // __p 为返回的字符串
     source = "var __t,__p='',__j=Array.prototype.join," +
-      "print=function(){__p+=__j.call(arguments,'');};\n" +
-      source + 'return __p;\n';
+    "print=function(){__p+=__j.call(arguments,'');};\n" +
+    source + 'return __p;\n';
 
     try {
       // render 方法，前两个参数为 render 方法的参数
@@ -2891,8 +2903,8 @@
     .map(function(a){ return a * 2; })
     .first()
     .value(); // 2
-  **/
-  _.chain = function(obj) {
+    **/
+    _.chain = function(obj) {
     // 无论是否 OOP 调用，都会转为 OOP 形式
     // 并且给新的构造对象添加了一个 _chain 属性
     var instance = _(obj);
