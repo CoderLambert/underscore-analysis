@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>underscore</title>
+</head>
+<body>
+
+<script src="underscore-1.8.3-analysis.js"></script>
+<script>
+    _.each([1,2,3],function(number){
+        console.log(number);
+    });
+
+    _.mixin({
+        amix:function(a,b){
+            console.log(a,b);
+        }
+    });
+    _(3).amix(4);
+    _.mixin({
+        capitalize: function(string) {
+            return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
+        }
+    });
+    console.log(_("fabio").capitalize());
+
+</script>
+</body>
+</html>

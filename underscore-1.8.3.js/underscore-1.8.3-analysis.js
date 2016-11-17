@@ -2951,18 +2951,36 @@
       // 直接把方法挂载到 _[name] 上
       // 调用类似 _.myFunc([1, 2, 3], ..)
       var func = _[name] = obj[name];
-
+      // console.log( _[name]);
       // 浅拷贝
       // 将 name 方法挂载到 _ 对象的原型链上，使之能 OOP 调用
       _.prototype[name] = function() {
         // 第一个参数
         var args = [this._wrapped];
-
+        // console.log('args',args);
         // arguments 为 name 方法需要的其他参数
         push.apply(args, arguments);
         // 执行 func 方法
         // 支持链式操作
+        console.log( _[name],args,arguments);
         return result(this, func.apply(_, args));
+        //---------------------------------------
+        //这个地方自己有一个很严重的理解误区...实际上，如果oop的方式调用，第一个参数应该是传在前面的，args的第一个参数就是调用时传入的那个变量，
+        //并且这里的this指向了_ 
+        //再仔细理解理解这两个例子，实际上这样是符合常理的：
+        // _.mixin({
+        //     amix:function(a,b){
+        //         console.log(a,b);
+        //     }
+        // });
+        // _(3).amix(4); //实际上这样用起来很方便
+        // _.mixin({
+        //     capitalize: function(string) {
+        //         return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
+        //     }
+        // });
+        // console.log(_("fabio").capitalize());
+        //---------------------------------------
       };
     });
   };
@@ -2975,6 +2993,7 @@
 
   // Add all mutator Array functions to the wrapper.
   // 将 Array 原型链上有的方法都添加到 underscore 中
+  // 这些方法只能采用oop的方式?
   _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
     var method = ArrayProto[name];
     _.prototype[name] = function() {
